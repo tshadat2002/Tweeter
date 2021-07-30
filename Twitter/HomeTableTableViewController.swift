@@ -15,16 +15,22 @@ class HomeTableTableViewController: UITableViewController {
     
     let myRefreshControl = UIRefreshControl()
     
+    override func viewDidAppear(_ animated: Bool) {
+           super.viewDidAppear(animated)
+           self.loadTweet()
+       }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        loadTweet()
-        myRefreshControl.addTarget(self, action: #selector(loadTweet), for: .valueChanged)
-        tableView.refreshControl = myRefreshControl
-        
-        
-    }
+            super.viewDidLoad()
+            myRefreshControl.addTarget(self, action: #selector(loadTweet), for: .valueChanged)
+            tableView.refreshControl = myRefreshControl
+            self.tableView.rowHeight = UITableView.automaticDimension
+            self.tableView.estimatedRowHeight = 150
+            loadTweet()
+            self.tableView.rowHeight = UITableView.automaticDimension
+            self.tableView.estimatedRowHeight = 300
+        }
+    
 
     @objc func loadTweet(){   /*calls on API to get data aka the tweets*/
         
@@ -34,7 +40,7 @@ class HomeTableTableViewController: UITableViewController {
         let myParams = ["count": numberOfTweet]
 
         
-        TwitterAPICaller.client?.getDictionariesRequest(url: myUrl, parameters: myParams, success: { (tweets: [NSDictionary]) in
+        TwitterAPICaller.client?.getDictionariesRequest(url: myUrl, parameters: myParams as [String : Any], success: { (tweets: [NSDictionary]) in
             
             self.tweetArray.removeAll()
             for tweet in tweets {
@@ -58,7 +64,7 @@ class HomeTableTableViewController: UITableViewController {
         numberOfTweet = numberOfTweet + 20
         let myParams = ["count": numberOfTweet]
         
-        TwitterAPICaller.client?.getDictionariesRequest(url: myUrl, parameters: myParams, success: { (tweets: [NSDictionary]) in
+        TwitterAPICaller.client?.getDictionariesRequest(url: myUrl, parameters: myParams as [String : Any], success: { (tweets: [NSDictionary]) in
             
             self.tweetArray.removeAll()
             for tweet in tweets {
@@ -109,6 +115,9 @@ class HomeTableTableViewController: UITableViewController {
         } /*sets the image of the tweet*/
         
         
+        cell.setFavorite(tweetArray[indexPath.row]["favorited"] as! Bool)
+        cell.tweetId = tweetArray[indexPath.row]["id"] as! Int
+        cell.setRetweeted(tweetArray[indexPath.row]["retweeted"] as! Bool)
         
         return cell
         
